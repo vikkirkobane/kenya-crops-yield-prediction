@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.env
+
+# Large / redundant model files (app only needs best_model.pkl)
+models/random_forest.pkl
+models/gradient_boosting.pkl
+models/xgboost.pkl
+models/linear_regression.pkl
+models/ridge_regression.pkl
+
+# Generated plots (reproducible via train_models.py)
+plots/
+
+# Temp PDF preview images
+pdf_pages/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Streamlit local cache
+.streamlit/cache/

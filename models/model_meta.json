@@ -1,0 +1,92 @@
+{
+  "best_model": "Gradient Boosting",
+  "features": [
+    "year",
+    "rainfall_mm",
+    "temperature_celsius",
+    "fertilizer_kg_per_ha",
+    "pesticide_kg_per_ha",
+    "farm_size_ha",
+    "elevation_m",
+    "irrigation",
+    "temp_deviation",
+    "fert_per_farm_ha",
+    "rain_fert_interaction",
+    "log_farm_size",
+    "decade",
+    "region_enc",
+    "crop_type_enc",
+    "soil_type_enc",
+    "rainfall_category_enc"
+  ],
+  "categorical_cols": [
+    "region",
+    "crop_type",
+    "soil_type",
+    "rainfall_category"
+  ],
+  "encoders": {
+    "region": [
+      "Central",
+      "Coast",
+      "Eastern",
+      "North Eastern",
+      "Nyanza",
+      "Rift Valley",
+      "Western"
+    ],
+    "crop_type": [
+      "Beans",
+      "Coffee",
+      "Maize",
+      "Sorghum",
+      "Tea",
+      "Wheat"
+    ],
+    "soil_type": [
+      "clay",
+      "loam",
+      "sandy",
+      "volcanic"
+    ],
+    "rainfall_category": [
+      "high",
+      "low",
+      "moderate",
+      "very_high"
+    ]
+  },
+  "target": "yield_kg_per_ha",
+  "results": {
+    "Linear Regression": {
+      "RMSE": 1983.18,
+      "MAE": 1236.42,
+      "R2": 0.2609,
+      "CV_R2": 0.2992
+    },
+    "Ridge Regression": {
+      "RMSE": 1982.08,
+      "MAE": 1233.57,
+      "R2": 0.2617,
+      "CV_R2": 0.2996
+    },
+    "Random Forest": {
+      "RMSE": 348.45,
+      "MAE": 163.77,
+      "R2": 0.9772,
+      "CV_R2": 0.9535
+    },
+    "Gradient Boosting": {
+      "RMSE": 293.71,
+      "MAE": 162.46,
+      "R2": 0.9838,
+      "CV_R2": 0.9602
+    },
+    "XGBoost": {
+      "RMSE": 326.68,
+      "MAE": 173.36,
+      "R2": 0.9799,
+      "CV_R2": 0.9601
+    }
+  }
+}
