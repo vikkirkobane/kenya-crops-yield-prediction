@@ -28,7 +28,7 @@ before harvest, using climate, soil, and agronomic inputs available to any farme
 ```bash
 # Clone the repo
 git clone https://github.com/vikkirkobane/kenya-crops-yield-prediction
-cd kenya-crop-yield-prediction
+cd kenya-crops-yield-prediction
 
 # Install dependencies
 pip install -r requirements.txt
