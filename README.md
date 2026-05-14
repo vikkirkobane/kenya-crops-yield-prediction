@@ -17,8 +17,8 @@ before harvest, using climate, soil, and agronomic inputs available to any farme
 
 ## Live Demo
 
-> **Deployed app:** https://kenya-crop-yield-predictiongit-5wld8bak9kdguwcqegcbmb.streamlit.app/
-> **GitHub:** https://github.com/vikkirkobane/kenya-crop-yield-prediction
+> **Deployed app:** [https://kenya-crops-yield-predictiongit-5wld8bak9kdguwcqegcbmb.streamlit.app/](https://kenya-crops-yield-prediction-gbouimdy3e87gtaair8plc.streamlit.app/)
+> **GitHub:** https://github.com/vikkirkobane/kenya-crops-yield-prediction
 > Run locally: `streamlit run app.py`
 
 ---
