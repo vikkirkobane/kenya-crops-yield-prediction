@@ -135,10 +135,7 @@ PRECOMPUTED_RESULTS = {
 }
 
 if FAST_MODE:
-    print("[Fast Mode Enabled] Training only the best model (Gradient Boosting) to save resources...")
-    models = {
-        "Gradient Boosting": models["Gradient Boosting"]
-    }
+    print("[Fast Mode Enabled] Training all models without cross-validation or plots to save resources...")
 
 # ── 6. Train & evaluate ─────────────────────────────────────────────────────
 print("\n" + "=" * 60)

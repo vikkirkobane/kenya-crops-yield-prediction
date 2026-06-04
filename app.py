@@ -21,15 +21,25 @@ st.set_page_config(
 MODELS_DIR = "models"
 
 @st.cache_resource
-def load_artifacts():
+def load_metadata_and_encoders():
     with open(f"{MODELS_DIR}/model_meta.json") as f:
         meta = json.load(f)
-    model = joblib.load(f"{MODELS_DIR}/best_model.pkl")
     encoders = {col: joblib.load(f"{MODELS_DIR}/le_{col}.pkl") for col in meta["categorical_cols"]}
-    return model, meta, encoders
+    return meta, encoders
+
+@st.cache_resource
+def load_model(model_name):
+    filename = model_name.replace(" ", "_").lower() + ".pkl"
+    return joblib.load(f"{MODELS_DIR}/{filename}")
+
+# Global fallback placeholders
+active_model = None
+selected_model_name = "Gradient Boosting"
 
 try:
-    model, meta, encoders = load_artifacts()
+    meta, encoders = load_metadata_and_encoders()
+    # Verify that the best model is loadable
+    _ = load_model(meta["best_model"])
     model_loaded = True
     load_error = None
 except Exception as e:
@@ -86,9 +96,25 @@ with st.sidebar:
     st.title("Kenya Crop Yield Predictor")
     st.caption("AI Skills Immersion Programme — Cohort 1 Capstone")
     st.divider()
-    st.subheader("Model Performance")
     if model_loaded:
-        st.success(f"**Active Model:** {meta['best_model']}")
+        st.subheader("Select Active Model")
+        model_options = list(meta["results"].keys())
+        default_index = model_options.index(meta["best_model"]) if meta["best_model"] in model_options else 0
+        selected_model_name = st.selectbox(
+            "Choose active model for predictions:",
+            options=model_options,
+            index=default_index
+        )
+        try:
+            active_model = load_model(selected_model_name)
+            st.success(f"**Active Model:** {selected_model_name}")
+        except Exception as e:
+            st.error(f"Failed to load {selected_model_name}. Fallback to best model.")
+            active_model = load_model(meta["best_model"])
+            selected_model_name = meta["best_model"]
+
+        st.divider()
+        st.subheader("Model Performance")
         results = meta["results"]
         perf_df = pd.DataFrame([
             {"Model": k, "RMSE": v["RMSE"], "MAE": v["MAE"], "R²": v["R2"]}
@@ -96,6 +122,7 @@ with st.sidebar:
         ]).sort_values("R²", ascending=False)
         st.dataframe(perf_df, hide_index=True, use_container_width=True)
     else:
+        st.subheader("Model Performance")
         st.error(f"Model not loaded: {load_error}")
         st.info("Run `python train_models.py` first.")
     st.divider()
@@ -177,8 +204,12 @@ with tab_predict:
             "irrigation": int(irrigation),
         }
 
+        if active_model is None:
+            st.error("No active model loaded. Please check model files or train models first.")
+            st.stop()
+
         X_input = build_features(inputs, meta, encoders)
-        prediction = model.predict(X_input)[0]
+        prediction = active_model.predict(X_input)[0]
         total_yield = prediction * farm_size
 
         res_col1, res_col2, res_col3 = st.columns(3)
@@ -201,7 +232,7 @@ with tab_predict:
             f"{temperature}°C temperature, and {fertilizer} kg/ha fertilizer is predicted to yield "
             f"**{prediction:,.0f} kg/ha**. "
             + ("Irrigation boosts this estimate by ~25%. " if irrigation else "")
-            + f"Model: {meta['best_model']} (R² = {meta['results'][meta['best_model']]['R2']:.3f})"
+            + f"Model: {selected_model_name} (R² = {meta['results'][selected_model_name]['R2']:.3f})"
         )
 
         # Rainfall benchmark
