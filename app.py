@@ -38,8 +38,9 @@ selected_model_name = "Gradient Boosting"
 
 try:
     meta, encoders = load_metadata_and_encoders()
-    # Verify that the best model is loadable
-    _ = load_model(meta["best_model"])
+    # Verify that all models are available and loadable (since they are git-ignored and must be trained on-the-fly)
+    for model_name in meta["results"].keys():
+        _ = load_model(model_name)
     model_loaded = True
     load_error = None
 except Exception as e:
@@ -109,7 +110,7 @@ with st.sidebar:
             active_model = load_model(selected_model_name)
             st.success(f"**Active Model:** {selected_model_name}")
         except Exception as e:
-            st.error(f"Failed to load {selected_model_name}. Fallback to best model.")
+            st.error(f"Failed to load {selected_model_name}: {e}. Fallback to best model.")
             active_model = load_model(meta["best_model"])
             selected_model_name = meta["best_model"]
 
