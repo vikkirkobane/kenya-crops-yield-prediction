@@ -151,9 +151,11 @@ with tab_predict:
                 import subprocess
                 # Run train_models.py in the background and capture output
                 result = subprocess.run([sys.executable, "train_models.py", "--fast"], capture_output=True, text=True, check=True)
-                # Clear function cache to reload the newly trained models
-                load_artifacts.clear()
-                model, meta, encoders = load_artifacts()
+                # Clear function caches to reload the newly trained models
+                load_metadata_and_encoders.clear()
+                load_model.clear()
+                meta, encoders = load_metadata_and_encoders()
+                _ = load_model(meta["best_model"])
                 st.success("✅ Models retrained and loaded successfully!")
                 st.rerun()
             except Exception as retrain_error:
