@@ -122,7 +122,7 @@ with tab_predict:
                 import sys
                 import subprocess
                 # Run train_models.py in the background and capture output
-                result = subprocess.run([sys.executable, "train_models.py"], capture_output=True, text=True, check=True)
+                result = subprocess.run([sys.executable, "train_models.py", "--fast"], capture_output=True, text=True, check=True)
                 # Clear function cache to reload the newly trained models
                 load_artifacts.clear()
                 model, meta, encoders = load_artifacts()
