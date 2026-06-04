@@ -32,8 +32,19 @@ try:
     model, meta, encoders = load_artifacts()
     model_loaded = True
 except Exception as e:
-    model_loaded = False
-    load_error = str(e)
+    # Try to retrain the model if loading fails (e.g., due to scikit-learn version mismatch on deployment)
+    try:
+        import sys
+        import subprocess
+        # Run train_models.py using the same Python interpreter to regenerate compatible pickle files
+        subprocess.run([sys.executable, "train_models.py"], check=True)
+        # Clear cache for the load_artifacts function so it attempts to reload the new files
+        load_artifacts.clear()
+        model, meta, encoders = load_artifacts()
+        model_loaded = True
+    except Exception as retrain_error:
+        model_loaded = False
+        load_error = f"Load error: {e}. Auto-retrain attempt failed: {retrain_error}"
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 def rainfall_category(mm):

@@ -152,12 +152,12 @@ for name, model in models.items():
     print(f"\n{name}")
     print(f"  RMSE  : {rmse:>8.2f} kg/ha")
     print(f"  MAE   : {mae:>8.2f} kg/ha")
-    print(f"  R²    : {r2:>8.4f}")
-    print(f"  CV R² : {cv_r2:>8.4f}")
+    print(f"  R2    : {r2:>8.4f}")
+    print(f"  CV R2 : {cv_r2:>8.4f}")
 
 # ── 7. Pick best model ──────────────────────────────────────────────────────
 best_name = max(results, key=lambda n: results[n]["R2"])
-print(f"\n✓ Best model: {best_name} (R² = {results[best_name]['R2']})")
+print(f"\nBest model: {best_name} (R2 = {results[best_name]['R2']})")
 
 best_model = models[best_name]
 joblib.dump(best_model, f"{MODELS_DIR}/best_model.pkl")
