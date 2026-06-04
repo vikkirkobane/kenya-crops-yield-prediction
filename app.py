@@ -147,10 +147,12 @@ with tab_predict:
         st.warning("⚠️ Model files are not compatible with the current environment. Auto-retraining the models now to ensure compatibility...")
         with st.spinner("Running the model training pipeline (Linear Regression, Ridge, Random Forest, Gradient Boosting, XGBoost)... This can take up to 2 minutes on the cloud."):
             try:
-                import sys
-                import subprocess
-                # Run train_models.py in the background and capture output
-                result = subprocess.run([sys.executable, "train_models.py", "--fast"], capture_output=True, text=True, check=True)
+                import os
+                # Set environment variable to enable fast-mode retraining in the training script
+                os.environ["FAST_MODE"] = "true"
+                # Run train_models.py in-process using exec()
+                with open("train_models.py", encoding="utf-8") as f:
+                    exec(f.read(), {"__name__": "__main__"})
                 # Clear function caches to reload the newly trained models
                 load_metadata_and_encoders.clear()
                 load_model.clear()
@@ -160,8 +162,8 @@ with tab_predict:
                 st.rerun()
             except Exception as retrain_error:
                 st.error(f"Failed to retrain models automatically: {retrain_error}")
-                if 'result' in locals() and hasattr(result, 'stderr') and hasattr(result, 'stdout'):
-                    st.text_area("Training logs (for debugging):", result.stderr + "\n" + result.stdout)
+                import traceback
+                st.text_area("Training error logs (for debugging):", traceback.format_exc())
                 st.stop()
 
     st.subheader("Enter Farm & Climate Details")

@@ -24,7 +24,7 @@ import xgboost as xgb
 warnings.filterwarnings("ignore")
 
 import sys
-FAST_MODE = "--fast" in sys.argv
+FAST_MODE = "--fast" in sys.argv or os.environ.get("FAST_MODE") == "true"
 
 DATA_PATH = "data/crop_yield_kenya.csv"
 MODELS_DIR = "models"
