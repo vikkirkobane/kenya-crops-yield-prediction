@@ -31,20 +31,10 @@ def load_artifacts():
 try:
     model, meta, encoders = load_artifacts()
     model_loaded = True
+    load_error = None
 except Exception as e:
-    # Try to retrain the model if loading fails (e.g., due to scikit-learn version mismatch on deployment)
-    try:
-        import sys
-        import subprocess
-        # Run train_models.py using the same Python interpreter to regenerate compatible pickle files
-        subprocess.run([sys.executable, "train_models.py"], check=True)
-        # Clear cache for the load_artifacts function so it attempts to reload the new files
-        load_artifacts.clear()
-        model, meta, encoders = load_artifacts()
-        model_loaded = True
-    except Exception as retrain_error:
-        model_loaded = False
-        load_error = f"Load error: {e}. Auto-retrain attempt failed: {retrain_error}"
+    model_loaded = False
+    load_error = str(e)
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 def rainfall_category(mm):
@@ -126,8 +116,23 @@ tab_predict, tab_explore, tab_about = st.tabs(["Predict Yield", "Explore Data", 
 # ── TAB 1: PREDICTION ─────────────────────────────────────────────────────────
 with tab_predict:
     if not model_loaded:
-        st.error("Model not available. Run `python train_models.py` first.")
-        st.stop()
+        st.warning("⚠️ Model files are not compatible with the current environment. Auto-retraining the models now to ensure compatibility...")
+        with st.spinner("Running the model training pipeline (Linear Regression, Ridge, Random Forest, Gradient Boosting, XGBoost)... This can take up to 2 minutes on the cloud."):
+            try:
+                import sys
+                import subprocess
+                # Run train_models.py in the background and capture output
+                result = subprocess.run([sys.executable, "train_models.py"], capture_output=True, text=True, check=True)
+                # Clear function cache to reload the newly trained models
+                load_artifacts.clear()
+                model, meta, encoders = load_artifacts()
+                st.success("✅ Models retrained and loaded successfully!")
+                st.rerun()
+            except Exception as retrain_error:
+                st.error(f"Failed to retrain models automatically: {retrain_error}")
+                if 'result' in locals() and hasattr(result, 'stderr') and hasattr(result, 'stdout'):
+                    st.text_area("Training logs (for debugging):", result.stderr + "\n" + result.stdout)
+                st.stop()
 
     st.subheader("Enter Farm & Climate Details")
 
